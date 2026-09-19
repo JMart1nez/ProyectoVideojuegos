@@ -1,0 +1,127 @@
+using UnityEngine;
+
+public class Ball : MonoBehaviour
+{
+    public float launchSpeed = 8f;
+    public Transform paddle;
+    public Vector3 offset = new Vector3(0, 0.75f, 0);
+
+    private Rigidbody rb;
+    private bool isLaunched = false;
+
+    void Awake()
+    {
+        rb = GetComponent<Rigidbody>();
+    }
+
+    void Start()
+    {
+        ResetBall();
+    }
+
+    private void Update()
+    {
+        if (!isLaunched)
+        {
+            FollowPaddle();
+            if (Input.GetKeyDown(KeyCode.Space))
+            {
+                Launch();
+            }
+        }
+
+        if (Input.GetKeyDown(KeyCode.R))
+        {
+            ResetBall();
+        }
+    }
+
+    void FixedUpdate()
+    {
+        if (!isLaunched) return;
+
+        // Mantener la velocidad constante
+        rb.linearVelocity = rb.linearVelocity.normalized * launchSpeed;
+
+        // Evitar trayectoria vertical pura
+        if (Mathf.Abs(rb.linearVelocity.x) < 2f)
+        {
+            float xDirection = Random.Range(0, 2) == 0 ? -1f : 1f;
+            rb.linearVelocity = new Vector3(
+                xDirection * 2f,
+                rb.linearVelocity.y,
+                0f
+            ).normalized * launchSpeed;
+        }
+    }
+
+    void FollowPaddle()
+    {
+        if (paddle != null)
+        {
+            transform.position = paddle.position + offset;
+        }
+    }
+
+    public void Launch()
+    {
+        if (isLaunched) return;
+
+        isLaunched = true;
+        float angle = Random.Range(30f, 150f);
+        float radians = angle * Mathf.Deg2Rad;
+        Vector3 direction = new Vector3(Mathf.Cos(radians), Mathf.Sin(radians), 0f);
+        rb.linearVelocity = direction.normalized * launchSpeed;
+    }
+
+    public void ResetBall()
+    {
+        isLaunched = false;
+        rb.linearVelocity = Vector3.zero;
+        rb.angularVelocity = Vector3.zero;
+        FollowPaddle();
+    }
+
+    void OnTriggerEnter(Collider other)
+    {
+        if (other.CompareTag("DeadZone"))
+        {
+            // Revisa cuántas pelotas hay en la escena
+            GameObject[] balls = GameObject.FindGameObjectsWithTag("Ball");
+            
+            if (balls.Length > 1)
+            {
+                // Si hay más de una destruye esta copia
+                Destroy(gameObject);
+            }
+            else
+            {
+                // Si es la última pelota que queda resta vidas
+                GameManager.Instance.LoseLifes();
+                ResetBall();
+            }
+        }
+    }
+
+    public void MultiplySpeed(float multi)
+    {
+        launchSpeed *= multi;
+    }
+
+    private void OnCollisionEnter(Collision collision)
+    {
+        // Control de dirección al golpear
+        if (collision.gameObject.CompareTag("Player")) 
+        {
+            float offset = (transform.position.x - collision.transform.position.x) / collision.collider.bounds.size.x;
+            Vector3 newDirection = new Vector3(offset * 2.5f, 1f, 0f).normalized;
+            rb.linearVelocity = newDirection * launchSpeed;
+        }
+        else
+        {
+            // Romper bucles al chocar con paredes o bloques
+            Vector3 randomTweak = new Vector3(Random.Range(-0.2f, 0.2f), Random.Range(-0.2f, 0.2f), 0f);
+            rb.linearVelocity = (rb.linearVelocity + randomTweak).normalized * launchSpeed;
+        }
+    }
+}
