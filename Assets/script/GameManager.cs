@@ -1,18 +1,35 @@
 using UnityEngine;
 using TMPro;
 
+// Declaración del enum para los modos de juego
+public enum GameMode { Solo, CoOp, Versus }
+
 public class GameManager : MonoBehaviour
 {
     public static GameManager Instance;
 
+    [Header("Configuración de Modo")]
+    public GameMode currentMode = GameMode.Solo;
+
+    [Header("Estadísticas Jugador 1")]
     public int lifes = 3;
     public int points = 0;
+
+    [Header("Estadísticas Jugador 2")]
+    public int lifesP2 = 3;
+    public int pointsP2 = 0;
+
+    [Header("Control de Bloques")]
     public Block[] blocks;
     public int blockCount = 0;
 
-    [Header("UI")]
+    [Header("UI Jugador 1")]
     public TMP_Text pointText;
     public TMP_Text lifesText;
+
+    [Header("UI Jugador 2")]
+    public TMP_Text pointTextP2;
+    public TMP_Text lifesTextP2;
 
     private void Awake()
     {
@@ -35,8 +52,13 @@ public class GameManager : MonoBehaviour
 
     void Update()
     {
-        if (pointText != null) pointText.text = $"Puntos: {points}";
-        if (lifesText != null) lifesText.text = $"Vidas: {lifes}";
+        // Actualiza interfaz Jugador 1
+        if (pointText != null) pointText.text = $"Puntos P1: {points}";
+        if (lifesText != null) lifesText.text = $"Vidas P1: {lifes}";
+
+        // Actualiza interfaz Jugador 2 si sus textos están asignados
+        if (pointTextP2 != null) pointTextP2.text = $"Puntos P2: {pointsP2}";
+        if (lifesTextP2 != null) lifesTextP2.text = $"Vidas P2: {lifesP2}";
     }
 
     public void BlockDestroy()
@@ -58,10 +80,22 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    public void LoseLifesP2()
+    {
+        lifesP2--;
+        if (lifesP2 <= 0)
+        {
+            EndGame();
+        }
+    }
+
     public void EndGame()
     {
-        GameObject player = GameObject.FindWithTag("Player");
-        if (player != null) player.SetActive(false);
+        GameObject[] players = GameObject.FindGameObjectsWithTag("Player");
+        foreach (GameObject player in players)
+        {
+            player.SetActive(false);
+        }
 
         GameObject[] balls = GameObject.FindGameObjectsWithTag("Ball");
         foreach (GameObject ball in balls)
