@@ -81,7 +81,7 @@ public class Ball : MonoBehaviour
         if (isLaunched) return;
 
         isLaunched = true;
-        float angle = Random.Range(30f, 150f);
+        float angle = Random.Range(-60f, 60f);
         float radians = angle * Mathf.Deg2Rad;
         Vector3 direction = new Vector3(Mathf.Cos(radians), Mathf.Sin(radians), 0f);
         rb.linearVelocity = direction.normalized * launchSpeed;
