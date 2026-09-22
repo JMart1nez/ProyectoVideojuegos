@@ -128,5 +128,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Capsule
   speed: 3
-  prefabBall: {fileID: 0}
+  prefabBall: {fileID: 4066845968622237945, guid: c81508734a4578c4eb9cfaa2b1fd73bc, type: 3}
   type: 0
+  moveDirection: {x: 0, y: -1, z: 0}

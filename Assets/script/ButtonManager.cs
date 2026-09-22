@@ -16,7 +16,7 @@ public class ButtonManager : MonoBehaviour
         if (GameManager.Instance != null)
             GameManager.Instance.currentMode = GameMode.CoOp;
 
-        SceneManager.LoadScene("Juego");
+        SceneManager.LoadScene("Cooperativo");
     }
 
     public void StartVersusGame()

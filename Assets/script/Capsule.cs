@@ -9,6 +9,9 @@ public class Capsule : MonoBehaviour
 
     private Transform currentBall;
 
+    // Direccion de movimiento personalizada
+    [HideInInspector] public Vector3 moveDirection = Vector3.down;
+
     void Start()
     {
         GameObject ballObj = GameObject.FindGameObjectWithTag("Ball");
@@ -16,12 +19,16 @@ public class Capsule : MonoBehaviour
         
         // 0 y 1: Poderes | 2 y 3: Desventajas
         type = Random.Range(0, 4); 
+        // 1: Limites de tamanio, ajustarlo para que quede dentro
+        // 3: Limites de tamanio, ajustar limites de movimiento para que no haya espacios
     }
 
     void Update()
     {
         // Movimiento hacia abajo
-        transform.Translate(Vector3.down * speed * Time.deltaTime, Space.World);
+        //transform.Translate(Vector3.down * speed * Time.deltaTime, Space.World);
+
+        transform.Translate(moveDirection * speed * Time.deltaTime, Space.World);
     }
 
     private void OnTriggerEnter(Collider other)

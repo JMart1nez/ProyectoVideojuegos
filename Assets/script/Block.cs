@@ -10,7 +10,20 @@ public class Block : MonoBehaviour
             int posibility = Random.Range(0,10);
             if(posibility == 5)
             {
-                Instantiate(capsule,this.transform.position,capsule.transform.rotation);
+                //Instantiate(capsule,this.transform.position,capsule.transform.rotation);
+                GameObject capLeft = Instantiate(capsule, transform.position, Quaternion.identity);
+                Capsule capScriptLeft = capLeft.GetComponent<Capsule>();
+                if (capScriptLeft != null)
+                {
+                    capScriptLeft.moveDirection = Vector3.left; // Viaja a la izquierda (P1)
+                }
+
+                GameObject capRight = Instantiate(capsule, transform.position, Quaternion.identity);
+                Capsule capScriptRight = capRight.GetComponent<Capsule>();
+                if (capScriptRight != null)
+                {
+                    capScriptRight.moveDirection = Vector3.right; // Viaja a la derecha (P2)
+                }
             }
             GameManager.Instance.BlockDestroy();
             Destroy(this.gameObject);
