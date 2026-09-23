@@ -56,15 +56,24 @@ public class Ball : MonoBehaviour
         // Mantener la velocidad constante
         rb.linearVelocity = rb.linearVelocity.normalized * launchSpeed;
 
-        // Evitar trayectoria vertical pura
-        if (Mathf.Abs(rb.linearVelocity.x) < 2f)
+        // Validar el modo de juego para evitar el atasco correcto
+        if (GameManager.Instance != null && GameManager.Instance.currentMode == GameMode.Solo)
         {
-            float xDirection = Random.Range(0, 2) == 0 ? -1f : 1f;
-            rb.linearVelocity = new Vector3(
-                xDirection * 2f,
-                rb.linearVelocity.y,
-                0f
-            ).normalized * launchSpeed;
+            // Evitar trayectoria vertical pura
+            if (Mathf.Abs(rb.linearVelocity.x) < 2f)
+            {
+                float xDirection = Random.Range(0, 2) == 0 ? -1f : 1f;
+                rb.linearVelocity = new Vector3(xDirection * 2f, rb.linearVelocity.y, 0f).normalized * launchSpeed;
+            }
+        }
+        else 
+        {
+            // Evitar trayectoria horizontal
+            if (Mathf.Abs(rb.linearVelocity.y) < 1.5f)
+            {
+                float yDirection = Random.Range(0, 2) == 0 ? -1f : 1f;
+                rb.linearVelocity = new Vector3(rb.linearVelocity.x, yDirection * 1.5f, 0f).normalized * launchSpeed;
+            }
         }
     }
 
@@ -123,12 +132,26 @@ public class Ball : MonoBehaviour
 
     private void OnCollisionEnter(Collision collision)
     {
-        // Control de dirección al golpear
         if (collision.gameObject.CompareTag("Player")) 
         {
-            float offset = (transform.position.x - collision.transform.position.x) / collision.collider.bounds.size.x;
-            Vector3 newDirection = new Vector3(offset * 2.5f, 1f, 0f).normalized;
-            rb.linearVelocity = newDirection * launchSpeed;
+            // Compara las dimensiones para saber si la paleta está en vertical u horizontal
+            bool isVerticalPaddle = collision.collider.bounds.size.y > collision.collider.bounds.size.x;
+
+            if (isVerticalPaddle)
+            {
+                // Rebote para MODO PONG 
+                float offsetY = (transform.position.y - collision.transform.position.y) / collision.collider.bounds.size.y;
+                float directionX = (transform.position.x > collision.transform.position.x) ? 1f : -1f;
+                Vector3 newDirection = new Vector3(directionX, offsetY * 2.5f, 0f).normalized;
+                rb.linearVelocity = newDirection * launchSpeed;
+            }
+            else
+            {
+                // Rebote para MODO CLÁSICO
+                float offsetX = (transform.position.x - collision.transform.position.x) / collision.collider.bounds.size.x;
+                Vector3 newDirection = new Vector3(offsetX * 2.5f, 1f, 0f).normalized;
+                rb.linearVelocity = newDirection * launchSpeed;
+            }
         }
         else
         {
