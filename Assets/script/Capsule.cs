@@ -9,19 +9,24 @@ public class Capsule : MonoBehaviour
 
     private Transform currentBall;
 
+    // Direccion de movimiento personalizada
+    [HideInInspector] public Vector3 moveDirection = Vector3.down;
+
     void Start()
     {
         GameObject ballObj = GameObject.FindGameObjectWithTag("Ball");
         if (ballObj != null) currentBall = ballObj.transform;
         
         // 0 y 1: Poderes | 2 y 3: Desventajas
-        type = Random.Range(0, 4); 
+        type = Random.Range(0, 4);                         
     }
 
     void Update()
     {
         // Movimiento hacia abajo
-        transform.Translate(Vector3.down * speed * Time.deltaTime, Space.World);
+        //transform.Translate(Vector3.down * speed * Time.deltaTime, Space.World);
+
+        transform.Translate(moveDirection * speed * Time.deltaTime, Space.World);
     }
 
     private void OnTriggerEnter(Collider other)
@@ -37,13 +42,14 @@ public class Capsule : MonoBehaviour
                     MultiBall();
                     break;
                 case 1: // Poder: Agrandar jugador
-                    StartCoroutine(ScalePlayer(other.transform, 1.5f, 5f));
+                    //StartCoroutine(ScalePlayer(other.transform, 1.5f, 5f));                    
+                    StartCoroutine(ExtendPlayer(other.transform, 5f));                    
                     break;
                 case 2: // Desventaja: Pelota veloz
                     StartCoroutine(ExtraSpeed());
                     break;
                 case 3: // Desventaja: Reducir jugador
-                    StartCoroutine(ScalePlayer(other.transform, 0.6f, 5f));
+                    StartCoroutine(ClipPlayer(other.transform, 5f));                    
                     break;
             }
 
@@ -66,12 +72,36 @@ public class Capsule : MonoBehaviour
         }
     }
 
+    // Si el jugador toma dos capsulas al mismo tiempo, su tamanio original se extiende o se reduce
+    /*
     IEnumerator ScalePlayer(Transform player, float factor, float duration)
-    {
+    {        
         Vector3 originalScale = player.localScale;
         player.localScale = new Vector3(originalScale.x * factor, originalScale.y, originalScale.z);
         yield return new WaitForSeconds(duration);
-        player.localScale = originalScale;
+        player.localScale = originalScale;        
+    }
+    */
+    IEnumerator ExtendPlayer(Transform player, float duration)
+    {
+        // Original: (3, 0.3, 1)
+        player.localScale = new Vector3(5f, 0.3f, 1f);
+
+        yield return new WaitForSeconds(duration);
+
+        // Regresa al original
+        player.localScale = new Vector3(3f, 0.3f, 1f);
+    }
+
+    IEnumerator ClipPlayer(Transform player, float duration)
+    {
+        // Original: (3, 0.3, 1)
+        player.localScale = new Vector3(1.5f, 0.3f, 1f);
+
+        yield return new WaitForSeconds(duration);
+
+        // Regresa al original
+        player.localScale = new Vector3(3f, 0.3f, 1f);
     }
 
     IEnumerator ExtraSpeed()

@@ -56,6 +56,19 @@ public class LevelSetup : MonoBehaviour
                 break;
 
             case GameMode.CoOp:
+                // Activa solo a Jugador 1
+                player1Paddle.SetActive(true);
+                if (ballP1 != null) ballP1.SetActive(true);
+
+                // Desactiva a Jugador 2
+                player2Paddle.SetActive(true);
+                if (ballP2 != null) ballP2.SetActive(true);
+
+                // Visibilidad de UI
+                if (uiPlayer1Group != null) uiPlayer1Group.SetActive(true);
+                if (uiPlayer2Group != null) uiPlayer2Group.SetActive(true);
+                break;
+
             case GameMode.Versus:
                 // Activa ambos jugadores y ambas pelotas
                 player1Paddle.SetActive(true);

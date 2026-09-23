@@ -4,10 +4,17 @@ public class Ball : MonoBehaviour
 {
     public float launchSpeed = 8f;
     public Transform paddle;
-    public Vector3 offset = new Vector3(0, 0.75f, 0);
+    public Vector3 offset;
 
     private Rigidbody rb;
     private bool isLaunched = false;
+
+    // Define de que lado esta asignada esta pelota
+    public enum PlayerSide { Left, Right }
+    [Header("Configuración de Inicio")]
+    public PlayerSide startingSide;
+    // Tecla para que el jugador lance la pelota
+    public KeyCode launchKey;
 
     void Awake()
     {
@@ -16,6 +23,12 @@ public class Ball : MonoBehaviour
 
     void Start()
     {
+        if(startingSide == PlayerSide.Left)
+        {
+            offset = new Vector3(0.75f, 0, 0);        
+        } else {
+            offset = new Vector3(-0.75f, 0, 0);        
+        }   
         ResetBall();
     }
 
@@ -24,7 +37,7 @@ public class Ball : MonoBehaviour
         if (!isLaunched)
         {
             FollowPaddle();
-            if (Input.GetKeyDown(KeyCode.Space))
+            if (Input.GetKeyDown(launchKey))
             {
                 Launch();
             }
@@ -68,7 +81,7 @@ public class Ball : MonoBehaviour
         if (isLaunched) return;
 
         isLaunched = true;
-        float angle = Random.Range(30f, 150f);
+        float angle = Random.Range(-60f, 60f);
         float radians = angle * Mathf.Deg2Rad;
         Vector3 direction = new Vector3(Mathf.Cos(radians), Mathf.Sin(radians), 0f);
         rb.linearVelocity = direction.normalized * launchSpeed;
@@ -89,7 +102,7 @@ public class Ball : MonoBehaviour
             // Revisa cuántas pelotas hay en la escena
             GameObject[] balls = GameObject.FindGameObjectsWithTag("Ball");
             
-            if (balls.Length > 1)
+            if (balls.Length > 2) 
             {
                 // Si hay más de una destruye esta copia
                 Destroy(gameObject);
