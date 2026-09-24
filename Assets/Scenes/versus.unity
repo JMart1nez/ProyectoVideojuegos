@@ -6873,8 +6873,13 @@ MonoBehaviour:
   ballP2: {fileID: 233266849}
   uiPlayer1Group: {fileID: 480100831}
   uiPlayer2Group: {fileID: 1174343131}
+  pointTextP1: {fileID: 1576098704}
+  lifesTextP1: {fileID: 334052457}
   pointTextP2: {fileID: 1157893479}
   lifesTextP2: {fileID: 226957171}
+  gameOverCanvas: {fileID: 825737269}
+  textoGanador: {fileID: 1246025459}
+  textoDetalle: {fileID: 448448137}
 --- !u!4 &1119794729
 Transform:
   m_ObjectHideFlags: 0
