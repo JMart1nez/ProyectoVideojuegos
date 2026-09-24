@@ -8,12 +8,11 @@ public class Ball : MonoBehaviour
 
     private Rigidbody rb;
     private bool isLaunched = false;
+    private bool isProcessingDeath = false; // ✅ NUEVO
 
-    // Define de que lado esta asignada esta pelota
     public enum PlayerSide { Left, Right }
     [Header("Configuración de Inicio")]
     public PlayerSide startingSide;
-    // Tecla para que el jugador lance la pelota
     public KeyCode launchKey;
 
     void Awake()
@@ -23,12 +22,14 @@ public class Ball : MonoBehaviour
 
     void Start()
     {
-        if(startingSide == PlayerSide.Left)
+        if (startingSide == PlayerSide.Left)
         {
-            offset = new Vector3(0.75f, 0, 0);        
-        } else {
-            offset = new Vector3(-0.75f, 0, 0);        
-        }   
+            offset = new Vector3(0.75f, 0, 0);
+        }
+        else
+        {
+            offset = new Vector3(-0.75f, 0, 0);
+        }
         ResetBall();
     }
 
@@ -53,22 +54,18 @@ public class Ball : MonoBehaviour
     {
         if (!isLaunched) return;
 
-        // Mantener la velocidad constante
         rb.linearVelocity = rb.linearVelocity.normalized * launchSpeed;
 
-        // Validar el modo de juego para evitar el atasco correcto
         if (GameManager.Instance != null && GameManager.Instance.currentMode == GameMode.Solo)
         {
-            // Evitar trayectoria vertical pura
             if (Mathf.Abs(rb.linearVelocity.x) < 2f)
             {
                 float xDirection = Random.Range(0, 2) == 0 ? -1f : 1f;
                 rb.linearVelocity = new Vector3(xDirection * 2f, rb.linearVelocity.y, 0f).normalized * launchSpeed;
             }
         }
-        else 
+        else
         {
-            // Evitar trayectoria horizontal
             if (Mathf.Abs(rb.linearVelocity.y) < 1.5f)
             {
                 float yDirection = Random.Range(0, 2) == 0 ? -1f : 1f;
@@ -108,21 +105,41 @@ public class Ball : MonoBehaviour
     {
         if (other.CompareTag("DeadZone"))
         {
-            // Revisa cuántas pelotas hay en la escena
+            // ✅ Evitar procesar la muerte 2 veces
+            if (isProcessingDeath) return;
+
             GameObject[] balls = GameObject.FindGameObjectsWithTag("Ball");
-            
-            if (balls.Length > 2) 
+
+            if (balls.Length > 2)
             {
-                // Si hay más de una destruye esta copia
+                // Si hay más de una (multiball), destruye esta copia
                 Destroy(gameObject);
             }
             else
             {
-                // Si es la última pelota que queda resta vidas
-                GameManager.Instance.LoseLifes();
+                isProcessingDeath = true;
+
+                if (startingSide == PlayerSide.Left)
+                {
+                    GameManager.Instance.LoseLifes();
+                }
+                else
+                {
+                    GameManager.Instance.LoseLifesP2();
+                }
+
                 ResetBall();
+
+                // ✅ Reactivar después de un pequeño delay
+                Invoke(nameof(ReactivateDeath), 0.5f);
             }
         }
+    }
+
+    // ✅ Método auxiliar
+    void ReactivateDeath()
+    {
+        isProcessingDeath = false;
     }
 
     public void MultiplySpeed(float multi)
@@ -132,14 +149,12 @@ public class Ball : MonoBehaviour
 
     private void OnCollisionEnter(Collision collision)
     {
-        if (collision.gameObject.CompareTag("Player")) 
+        if (collision.gameObject.CompareTag("Player"))
         {
-            // Compara las dimensiones para saber si la paleta está en vertical u horizontal
             bool isVerticalPaddle = collision.collider.bounds.size.y > collision.collider.bounds.size.x;
 
             if (isVerticalPaddle)
             {
-                // Rebote para MODO PONG 
                 float offsetY = (transform.position.y - collision.transform.position.y) / collision.collider.bounds.size.y;
                 float directionX = (transform.position.x > collision.transform.position.x) ? 1f : -1f;
                 Vector3 newDirection = new Vector3(directionX, offsetY * 2.5f, 0f).normalized;
@@ -147,7 +162,6 @@ public class Ball : MonoBehaviour
             }
             else
             {
-                // Rebote para MODO CLÁSICO
                 float offsetX = (transform.position.x - collision.transform.position.x) / collision.collider.bounds.size.x;
                 Vector3 newDirection = new Vector3(offsetX * 2.5f, 1f, 0f).normalized;
                 rb.linearVelocity = newDirection * launchSpeed;
@@ -155,7 +169,6 @@ public class Ball : MonoBehaviour
         }
         else
         {
-            // Romper bucles al chocar con paredes o bloques
             Vector3 randomTweak = new Vector3(Random.Range(-0.2f, 0.2f), Random.Range(-0.2f, 0.2f), 0f);
             rb.linearVelocity = (rb.linearVelocity + randomTweak).normalized * launchSpeed;
         }

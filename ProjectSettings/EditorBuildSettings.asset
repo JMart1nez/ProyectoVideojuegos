@@ -14,5 +14,8 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Cooperativo.unity
     guid: 413f2c58693717e4d9053a08f3cd1de5
+  - enabled: 1
+    path: Assets/Scenes/Versus.unity
+    guid: 21204b3b66256774fa3f6bde2eabc3cb
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
