@@ -14,31 +14,45 @@ public class player : MonoBehaviour
     [Header("Controles del Jugador")]
     public KeyCode keyUp;
     public KeyCode keyDown;
-
-    [Header("Referencia Multijugador / Solo")]
-    public bool isPlayer1 = true;
-    public player otherPlayerPad; // Asignar Pad 2 en Pad 1 y viceversa desde el Inspector
+    
+    // Start is called once before the first execution of Update after the MonoBehaviour is created
+    void Start()
+    {
+        FixedUpdate();       
+    }
 
     void Awake()
     {        
-        rb = GetComponent<Rigidbody>();
+    	rb = GetComponent<Rigidbody>();
         padCollider = GetComponent<Collider>();
+        // Calculamos la posicion real de las paredes sumando el tamanio inicial
         float posWall = padCollider != null ? padCollider.bounds.extents.y : 0f;
         leftWall = minY - posWall;
         rightWall = maxY + posWall;
     }
+    
+    void FixedUpdate()
+    {
+    	Vector3 newPosition = rb.position + transform.right * input * speed * Time.fixedDeltaTime;
 
+        // Calculamos la posicion real de las paredes (por si cambio de tamanio con un Power-Up)
+        float posWall = padCollider != null ? padCollider.bounds.extents.y : 0f;
+
+        // Ajustamos los limites exactos sin dejar espacio fantasma
+        minY = leftWall + posWall;
+        maxY = rightWall - posWall;
+
+        // Limitar la posicion dentro del nuevo rango dinamico
+        newPosition.y = Mathf.Clamp(newPosition.y, minY, maxY);
+
+        rb.MovePosition(newPosition);
+    }
+
+    // Update is called once per frame
     void Update()
     {
         input = 0f;
 
-        // Si estamos en Solo y somos P2, no leemos teclado directo (P1 nos moverá)
-        if (GameManager.Instance != null && GameManager.Instance.currentMode == GameMode.Solo && !isPlayer1)
-        {
-            return;
-        }
-
-        // Lectura habitual de controles
         if (Input.GetKey(keyUp))
         {
             input = -1f;
@@ -47,24 +61,5 @@ public class player : MonoBehaviour
         {
             input = 1f;
         }
-
-        // Si estamos en Solo y somos P1, replicamos nuestra dirección en P2
-        if (GameManager.Instance != null && GameManager.Instance.currentMode == GameMode.Solo && isPlayer1 && otherPlayerPad != null)
-        {
-            otherPlayerPad.input = this.input;
-        }
-    }
-
-    void FixedUpdate()
-    {
-        Vector3 newPosition = rb.position + transform.right * input * speed * Time.fixedDeltaTime;
-
-        float posWall = padCollider != null ? padCollider.bounds.extents.y : 0f;
-        minY = leftWall + posWall;
-        maxY = rightWall - posWall;
-
-        newPosition.y = Mathf.Clamp(newPosition.y, minY, maxY);
-
-        rb.MovePosition(newPosition);
     }
 }
