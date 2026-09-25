@@ -36,9 +36,18 @@ public class LevelSetup : MonoBehaviour
         {
             mode = GameManager.Instance.currentMode;
 
-            // Reset de estadísticas al entrar a un nuevo nivel
-            GameManager.Instance.lifes = 3;
-            GameManager.Instance.lifesP2 = 3;
+            // Ajustar vidas segÃºn el modo
+            if (mode == GameMode.Solo)
+            {
+                GameManager.Instance.lifes = 3;
+                GameManager.Instance.lifesP2 = 3;
+            }
+            else
+            {
+                GameManager.Instance.lifes = 5;
+                GameManager.Instance.lifesP2 = 5;
+            }
+            
             GameManager.Instance.points = 0;
             GameManager.Instance.pointsP2 = 0;
 

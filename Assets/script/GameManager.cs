@@ -82,7 +82,6 @@ public class GameManager : MonoBehaviour
     public void BlockDestroy()
     {
         blockCount--;
-        // ⚠️ Ya NO sumamos puntos aquí.
         // Los puntos se suman desde Block.cs según qué pelota rompió el bloque.
 
         if (blockCount <= 0)

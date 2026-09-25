@@ -618,6 +618,9 @@ MonoBehaviour:
   lifesText: {fileID: 334052457}
   pointTextP2: {fileID: 139623258}
   lifesTextP2: {fileID: 178634732}
+  gameOverCanvas: {fileID: 0}
+  textoGanador: {fileID: 0}
+  textoDetalle: {fileID: 0}
 --- !u!4 &90774542
 Transform:
   m_ObjectHideFlags: 0
@@ -842,8 +845,8 @@ Transform:
   m_GameObject: {fileID: 138199402}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: -0.7071068, w: 0.7071068}
-  m_LocalPosition: {x: -15.754984, y: 12.322474, z: 1.53}
-  m_LocalScale: {x: 15, y: 0.5, z: 2}
+  m_LocalPosition: {x: -16.02, y: 12.322474, z: 1.53}
+  m_LocalScale: {x: 15, y: 0.6591, z: 2}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1807770057}
@@ -1459,6 +1462,10 @@ PrefabInstance:
       propertyPath: paddle
       value: 
       objectReference: {fileID: 936039094}
+    - target: {fileID: 5547137288297810959, guid: c81508734a4578c4eb9cfaa2b1fd73bc, type: 3}
+      propertyPath: m_CollisionDetection
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: 8096842600356142817, guid: c81508734a4578c4eb9cfaa2b1fd73bc, type: 3}
       propertyPath: m_LocalPosition.x
       value: 12.980014
@@ -6634,8 +6641,13 @@ MonoBehaviour:
   ballP2: {fileID: 233266849}
   uiPlayer1Group: {fileID: 480100831}
   uiPlayer2Group: {fileID: 619923970}
+  pointTextP1: {fileID: 0}
+  lifesTextP1: {fileID: 0}
   pointTextP2: {fileID: 139623258}
   lifesTextP2: {fileID: 178634732}
+  gameOverCanvas: {fileID: 0}
+  textoGanador: {fileID: 0}
+  textoDetalle: {fileID: 0}
 --- !u!4 &1119794729
 Transform:
   m_ObjectHideFlags: 0
@@ -6819,7 +6831,7 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 1, y: 1, z: 1}
+  m_Size: {x: 1, y: 4, z: 0}
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!23 &1128074972
 MeshRenderer:
@@ -6887,8 +6899,8 @@ Transform:
   m_GameObject: {fileID: 1128074970}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: -0.7071068, w: 0.7071068}
-  m_LocalPosition: {x: -15.01, y: 11.86, z: 0}
-  m_LocalScale: {x: 14.0777, y: 0.3117, z: 1}
+  m_LocalPosition: {x: -45.57, y: -3.497, z: 0}
+  m_LocalScale: {x: 223.723, y: 15.446188, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -8348,7 +8360,7 @@ Transform:
   m_GameObject: {fileID: 1390246883}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0.7071068, w: 0.7071068}
-  m_LocalPosition: {x: 14.354983, y: 12.367521, z: 1.53}
+  m_LocalPosition: {x: 14.74, y: 12.367521, z: 1.53}
   m_LocalScale: {x: 15, y: 0.5, z: 2}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -12652,7 +12664,7 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 1, y: 1, z: 1}
+  m_Size: {x: 1, y: 10, z: 0}
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!23 &2084651843
 MeshRenderer:
@@ -12720,8 +12732,8 @@ Transform:
   m_GameObject: {fileID: 2084651841}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0.7071068, w: 0.7071068}
-  m_LocalPosition: {x: 14.75, y: 12.12, z: 0}
-  m_LocalScale: {x: 14.0777, y: 0.3117, z: 1}
+  m_LocalPosition: {x: 68.79, y: -9.0375, z: 0}
+  m_LocalScale: {x: 140.59512, y: 10.747556, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -13134,6 +13146,14 @@ PrefabInstance:
       propertyPath: m_Name
       value: CapsulaPoder
       objectReference: {fileID: 0}
+    - target: {fileID: 2209379598276347113, guid: 64b8ea1cd5c32dc4092fb1e8fa22105e, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2209379598276347113, guid: 64b8ea1cd5c32dc4092fb1e8fa22105e, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 6353f37919eb1b241a8b593f7086257e, type: 2}
     - target: {fileID: 3944553418196263645, guid: 64b8ea1cd5c32dc4092fb1e8fa22105e, type: 3}
       propertyPath: prefabBall
       value: 
@@ -13203,6 +13223,10 @@ PrefabInstance:
       propertyPath: paddle
       value: 
       objectReference: {fileID: 936039094}
+    - target: {fileID: 5547137288297810959, guid: c81508734a4578c4eb9cfaa2b1fd73bc, type: 3}
+      propertyPath: m_CollisionDetection
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: 8096842600356142817, guid: c81508734a4578c4eb9cfaa2b1fd73bc, type: 3}
       propertyPath: m_LocalPosition.x
       value: -13.374873
