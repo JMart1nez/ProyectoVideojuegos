@@ -112,3 +112,10 @@ InitTestScene*.unity*
 
 # Auto-generated cache in Assets folder
 /[Aa]ssets/[Ss]ceneDependencyCache*
+
+# Archivos locales que no deben subirse
+.vsconfig
+.vsconfig_backup
+UpgradeLog.htm
+ProjectSettings/ProjectAuditorSettings.asset
+ProjectAuditorSettings.asset

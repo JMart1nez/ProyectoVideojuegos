@@ -31,6 +31,11 @@ public class GameManager : MonoBehaviour
     public TMP_Text pointTextP2;
     public TMP_Text lifesTextP2;
 
+    [Header("UI de Game Over")]
+    public GameObject gameOverCanvas;
+    public TMP_Text textoGanador;
+    public TMP_Text textoDetalle;
+
     private void Awake()
     {
         if (Instance != null && Instance != this)
@@ -61,10 +66,25 @@ public class GameManager : MonoBehaviour
         if (lifesTextP2 != null) lifesTextP2.text = $"Vidas P2: {lifesP2}";
     }
 
+    // === NUEVOS MÉTODOS PARA SUMAR PUNTOS POR JUGADOR ===
+    public void AddPointsP1(int amount)
+    {
+        points += amount;
+    }
+
+    public void AddPointsP2(int amount)
+    {
+        pointsP2 += amount;
+    }
+
+    // ====================================================
+
     public void BlockDestroy()
     {
         blockCount--;
-        points += 100;
+        // ⚠️ Ya NO sumamos puntos aquí.
+        // Los puntos se suman desde Block.cs según qué pelota rompió el bloque.
+
         if (blockCount <= 0)
         {
             EndGame();
@@ -96,6 +116,7 @@ public class GameManager : MonoBehaviour
     public void LoseLifesP2() => LoseLifeP2(); 
     public void EndGame()
     {
+        // Desactiva jugadores y pelotas
         GameObject[] players = GameObject.FindGameObjectsWithTag("Player");
         foreach (GameObject player in players)
         {
@@ -106,6 +127,71 @@ public class GameManager : MonoBehaviour
         foreach (GameObject ball in balls)
         {
             ball.SetActive(false);
+        }
+
+        // === MOSTRAR PANTALLA DE GAME OVER ===
+        string mensajeGanador = "";
+        string mensajeDetalle = "";
+
+        switch (currentMode)
+        {
+            case GameMode.Solo:
+                mensajeGanador = "¡NIVEL COMPLETADO!";
+                mensajeDetalle = $"Puntos: {points}";
+                break;
+
+            case GameMode.CoOp:
+                mensajeGanador = "¡NIVEL COMPLETADO!";
+                mensajeDetalle = $"Puntos totales: {points}";
+                break;
+
+            case GameMode.Versus:
+                // Determinar ganador por vidas o por puntos
+                if (lifes <= 0 && lifesP2 > 0)
+                {
+                    mensajeGanador = "¡JUGADOR 2 GANA!";
+                }
+                else if (lifesP2 <= 0 && lifes > 0)
+                {
+                    mensajeGanador = "¡JUGADOR 1 GANA!";
+                }
+                else if (lifes <= 0 && lifesP2 <= 0)
+                {
+                    mensajeGanador = "¡EMPATE!";
+                }
+                else
+                {
+                    // Se acabaron los bloques: gana quien tenga más puntos
+                    if (points > pointsP2)
+                        mensajeGanador = "¡JUGADOR 1 GANA!";
+                    else if (pointsP2 > points)
+                        mensajeGanador = "¡JUGADOR 2 GANA!";
+                    else
+                        mensajeGanador = "¡EMPATE!";
+                }
+
+                mensajeDetalle = $"P1: {points} pts ({lifes} vidas)  |  P2: {pointsP2} pts ({lifesP2} vidas)";
+                break;
+        }
+
+        Debug.Log("=== FIN DEL JUEGO ===");
+        Debug.Log(mensajeGanador);
+        Debug.Log(mensajeDetalle);
+
+        // Activar el Canvas y poner los textos
+        if (gameOverCanvas != null)
+        {
+            gameOverCanvas.SetActive(true);
+        }
+
+        if (textoGanador != null)
+        {
+            textoGanador.text = mensajeGanador;
+        }
+
+        if (textoDetalle != null)
+        {
+            textoDetalle.text = mensajeDetalle;
         }
     }
 }

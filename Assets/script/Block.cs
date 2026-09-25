@@ -7,7 +7,7 @@ public class Block : MonoBehaviour
 
     private void Start()
     {
-        // Asignación de color aleatorio al iniciar
+        // Asignación de color aleatorio al iniciar con validación de seguridad
         Renderer blockRenderer = GetComponent<Renderer>();
         if (blockRenderer != null)
         {
@@ -20,53 +20,57 @@ public class Block : MonoBehaviour
     {
         if (collision.gameObject.CompareTag("Ball"))
         {
+            // 1. Lógica de Puntuación (Versión de tu compañero)
+            Ball ball = collision.gameObject.GetComponent<Ball>();
+            if (ball != null && GameManager.Instance != null)
+            {
+                if (GameManager.Instance.currentMode == GameMode.Solo || GameManager.Instance.currentMode == GameMode.CoOp)
+                {
+                    GameManager.Instance.AddPointsP1(100);
+                }
+                else if (GameManager.Instance.currentMode == GameMode.Versus)
+                {
+                    if (ball.startingSide == Ball.PlayerSide.Left)
+                        GameManager.Instance.AddPointsP1(100);
+                    else
+                        GameManager.Instance.AddPointsP2(100);
+                }
+            }
+
+            // 2. Lógica de Cápsulas (Tu versión adaptativa)
             if (capsule != null)
             {
                 int posibility = Random.Range(0, 10);
                 if (posibility == 5)
                 {
-                    // Comprobamos si el GameManager está en Modo Individual
                     bool isSoloMode = GameManager.Instance != null && GameManager.Instance.currentMode == GameMode.Solo;
 
                     if (isSoloMode)
                     {
-                        // --- MODO INDIVIDUAL (Arriba / Abajo) ---
-                        
+                        // Modo Individual: Arriba / Abajo
                         GameObject capDown = Instantiate(capsule, transform.position, Quaternion.identity);
                         Capsule capScriptDown = capDown.GetComponent<Capsule>();
-                        if (capScriptDown != null)
-                        {
-                            capScriptDown.moveDirection = Vector3.down;
-                        }
+                        if (capScriptDown != null) capScriptDown.moveDirection = Vector3.down;
 
                         GameObject capUp = Instantiate(capsule, transform.position, Quaternion.identity);
                         Capsule capScriptUp = capUp.GetComponent<Capsule>();
-                        if (capScriptUp != null)
-                        {
-                            capScriptUp.moveDirection = Vector3.up;
-                        }
+                        if (capScriptUp != null) capScriptUp.moveDirection = Vector3.up;
                     }
                     else
                     {
-                        // --- MODO CO-OP / VERSUS (Izquierda / Derecha) ---
-                        
+                        // Modo Co-op / Versus: Izquierda / Derecha
                         GameObject capLeft = Instantiate(capsule, transform.position, Quaternion.identity);
                         Capsule capScriptLeft = capLeft.GetComponent<Capsule>();
-                        if (capScriptLeft != null)
-                        {
-                            capScriptLeft.moveDirection = Vector3.left;
-                        }
+                        if (capScriptLeft != null) capScriptLeft.moveDirection = Vector3.left;
 
                         GameObject capRight = Instantiate(capsule, transform.position, Quaternion.identity);
                         Capsule capScriptRight = capRight.GetComponent<Capsule>();
-                        if (capScriptRight != null)
-                        {
-                            capScriptRight.moveDirection = Vector3.right;
-                        }
+                        if (capScriptRight != null) capScriptRight.moveDirection = Vector3.right;
                     }
                 }
             }
 
+            // 3. Destrucción del bloque
             if (GameManager.Instance != null)
             {
                 GameManager.Instance.BlockDestroy();
@@ -75,4 +79,5 @@ public class Block : MonoBehaviour
             Destroy(gameObject);
         }
     }
+
 }
