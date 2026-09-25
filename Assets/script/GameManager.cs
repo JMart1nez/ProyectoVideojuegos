@@ -51,7 +51,7 @@ public class GameManager : MonoBehaviour
 
     void Start()
     {
-        blocks = FindObjectsByType<Block>(FindObjectsSortMode.None);
+        blocks = FindObjectsByType<Block>(FindObjectsInactive.Exclude, FindObjectsSortMode.None);
         blockCount = blocks.Length;
     }
 
@@ -137,7 +137,7 @@ public class GameManager : MonoBehaviour
         // === MOSTRAR PANTALLA DE GAME OVER ===
         string mensajeGanador = "";
         string mensajeDetalle = "";
-
+        
         switch (currentMode)
         {
             case GameMode.Solo:
