@@ -56,29 +56,31 @@ public class Capsule : MonoBehaviour
             {
                 case 0: // Poder: Multibola
                     MultiBall();
+                    tiempoDeDestruccion = 0.1f;
                     break;
-                case 1: // Poder: Agrandar jugador
+                case 1: // Poder: Agrandar jugador (Duración 5s)
                     StartCoroutine(ExtendPlayer(other.transform, 5f));
                     tiempoDeDestruccion = 5.5f;                    
                     break;
-                case 2: // Desventaja: Pelota veloz
+                case 2: // Desventaja: Pelota veloz (Duración 4s)
                     StartCoroutine(ExtraSpeed());
                     tiempoDeDestruccion = 4.5f;
                     break;
-                case 3: // Desventaja: Reducir jugador
+                case 3: // Desventaja: Reducir jugador (Duración 5s)
                     StartCoroutine(ClipPlayer(other.transform, 5f));
                     tiempoDeDestruccion = 5.5f;                    
                     break;
-                case 4: // Poder Novedoso: Imán Repulsor Temporal
+                case 4: // Poder Novedoso: Imán Repulsor Temporal (Duración 6s)
                     StartCoroutine(RepulsorMagnet(other.transform, 6f, 3.5f));
                     tiempoDeDestruccion = 6.5f;
                     break;
                 case 5: // Desventaja: Perder una vida
                     TakeDamage(other.gameObject);
+                    tiempoDeDestruccion = 0.1f;
                     break;
             }
 
-            Destroy(gameObject, 0.1f);
+            Destroy(gameObject, tiempoDeDestruccion);
         }
     }
 
@@ -86,8 +88,6 @@ public class Capsule : MonoBehaviour
     void MultiBall()
     {
         if (currentBall == null) return;
-        
-        Vector3 spawnPos = currentBall.position + new Vector3(0.5f, 0f, 0f);
 
         for (int i = 0; i < 2; i++)
         {
@@ -133,7 +133,7 @@ public class Capsule : MonoBehaviour
         }
     }
 
-    //  IMÁN REPULSOR TEMPORAL 
+    // IMÁN REPULSOR TEMPORAL 
     IEnumerator RepulsorMagnet(Transform player, float duration, float magnetRadius)
     {
         float timer = 0f;
@@ -156,10 +156,9 @@ public class Capsule : MonoBehaviour
                         Rigidbody ballRb = b.GetComponent<Rigidbody>();
                         if (ballRb != null)
                         {
-                            // Direccion que empuja hacia arriba/afuera del pad
                             Vector3 pushDirection = (b.transform.position - player.position).normalized;
-                            if (pushDirection.y < 0.2f) pushDirection.y = 0.8f; // Asegura impulso vertical
-                            
+                            if (pushDirection.y < 0.2f) pushDirection.y = 0.8f; 
+
                             ballRb.linearVelocity = pushDirection.normalized * ballRb.linearVelocity.magnitude;
                         }
                     }
@@ -170,12 +169,11 @@ public class Capsule : MonoBehaviour
         }
     }
 
-    //  DESVENTAJA: PERDER UNA VIDA 
+    // DESVENTAJA: PERDER UNA VIDA 
     void TakeDamage(GameObject playerObj)
     {
         if (GameManager.Instance != null)
         {
-            // Resta vida según cuál sea el jugador
             if (playerObj.name.Contains("2"))
             {
                 GameManager.Instance.LoseLifeP2();
