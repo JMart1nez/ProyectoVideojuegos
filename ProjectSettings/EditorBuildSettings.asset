@@ -9,13 +9,13 @@ EditorBuildSettings:
     path: Assets/Scenes/Menu.unity
     guid: 1b7b3ac808bcafa72a37090120d67a2d
   - enabled: 1
-    path: Assets/Scenes/Juego.unity
-    guid: 99c9720ab356a0642a771bea13969a05
+    path: Assets/Scenes/Individual.unity
+    guid: eb4ae928973f324698999cdb43e0972c
   - enabled: 1
     path: Assets/Scenes/Cooperativo.unity
     guid: 413f2c58693717e4d9053a08f3cd1de5
   - enabled: 1
     path: Assets/Scenes/versus.unity
-    guid: c11841b0842364641a42aa1d11fa6fff
+    guid: 21204b3b66256774fa3f6bde2eabc3cb
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}

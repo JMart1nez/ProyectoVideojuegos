@@ -155,7 +155,7 @@ public class Ball : MonoBehaviour
 
             // 2. Si llegamos aquí, es una PELOTA ORIGINAL
             isProcessingDeath = true;
-            bool isSolo = GameManager.Instance != null && GameManager.Instance.currentMode == GameMode.Solo;
+            bool isSolo = GameManager.Instance != null && (GameManager.Instance.currentMode == GameMode.Solo || GameManager.Instance.currentMode == GameMode.CoOp);
 
             if (isSolo)
             {

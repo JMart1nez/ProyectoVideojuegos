@@ -56,14 +56,20 @@ public class GameManager : MonoBehaviour
     }
 
     void Update()
-    {
-        // Actualiza interfaz Jugador 1
-        if (pointText != null) pointText.text = $"Puntos P1: {points}";
-        if (lifesText != null) lifesText.text = $"Vidas P1: {lifes}";
+    {        
+        if(currentMode == GameMode.Solo || currentMode == GameMode.CoOp)
+        {
+            if (pointText != null) pointText.text = $"Puntos: {points}";
+            if (lifesText != null) lifesText.text = $"Vidas: {lifes}";
+        } else {
+            // Actualiza interfaz Jugador 1
+            if (pointText != null) pointText.text = $"Puntos P1: {points}";
+            if (lifesText != null) lifesText.text = $"Vidas P1: {lifes}";
 
-        // Actualiza interfaz Jugador 2 si sus textos están asignados
-        if (pointTextP2 != null) pointTextP2.text = $"Puntos P2: {pointsP2}";
-        if (lifesTextP2 != null) lifesTextP2.text = $"Vidas P2: {lifesP2}";
+            // Actualiza interfaz Jugador 2 si sus textos están asignados
+            if (pointTextP2 != null) pointTextP2.text = $"Puntos P2: {pointsP2}";
+            if (lifesTextP2 != null) lifesTextP2.text = $"Vidas P2: {lifesP2}";            
+        }
     }
 
     // === NUEVOS MÉTODOS PARA SUMAR PUNTOS POR JUGADOR ===
@@ -92,7 +98,7 @@ public class GameManager : MonoBehaviour
 
     // Métodos para restar vidas al Jugador 1
     public void LoseLifeP1()
-    {
+    {    
         lifes--;
         if (lifes <= 0)
         {
@@ -135,13 +141,23 @@ public class GameManager : MonoBehaviour
         switch (currentMode)
         {
             case GameMode.Solo:
-                mensajeGanador = "¡NIVEL COMPLETADO!";
-                mensajeDetalle = $"Puntos: {points}";
+                if (lifes <= 0){
+                    mensajeGanador = "¡PERDISTE!";
+                    mensajeDetalle = $"Puntos totales: {points}";
+                } else {
+                    mensajeGanador = "¡NIVEL COMPLETADO!";
+                    mensajeDetalle = $"Puntos totales: {points}";
+                }                
                 break;
 
             case GameMode.CoOp:
-                mensajeGanador = "¡NIVEL COMPLETADO!";
-                mensajeDetalle = $"Puntos totales: {points}";
+                if (lifes <= 0){
+                    mensajeGanador = "¡PERDIERON!";
+                    mensajeDetalle = $"Puntos totales: {points}";
+                } else {
+                    mensajeGanador = "¡NIVEL COMPLETADO!";
+                    mensajeDetalle = $"Puntos totales: {points}";
+                }                
                 break;
 
             case GameMode.Versus:
