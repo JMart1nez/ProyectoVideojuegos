@@ -8,7 +8,7 @@ public class ButtonManager : MonoBehaviour
         if (GameManager.Instance != null)
             GameManager.Instance.currentMode = GameMode.Solo;
         
-        SceneManager.LoadScene("Juego");
+        SceneManager.LoadScene("Individual");
     }
 
     public void StartCoOpGame()

@@ -71,7 +71,8 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    public void LoseLifes()
+    // Métodos para restar vidas al Jugador 1
+    public void LoseLifeP1()
     {
         lifes--;
         if (lifes <= 0)
@@ -80,7 +81,10 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    public void LoseLifesP2()
+    public void LoseLifes() => LoseLifeP1(); 
+
+    // Métodos para restar vidas al Jugador 2
+    public void LoseLifeP2()
     {
         lifesP2--;
         if (lifesP2 <= 0)
@@ -89,6 +93,7 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    public void LoseLifesP2() => LoseLifeP2(); 
     public void EndGame()
     {
         GameObject[] players = GameObject.FindGameObjectsWithTag("Player");

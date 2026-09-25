@@ -14,11 +14,11 @@ public class BlockGenerator : MonoBehaviour
     public Vector2 blockSpacing = new Vector2(2f, 0.8f); // Distancia entre bloques (X, Y)
 
     [Header("Posición de la Pared (Offset)")]
-    public Vector3 centerOffset = new Vector3(0f, 12f, 0f); // Ajusta la altura Z / Y según el eje de tu juego
+    public Vector3 centerOffset = new Vector3(0f, 12f, 0f); 
 
     [Header("Pasillos / Huecos Aleatorios")]
     [Range(0f, 1f)]
-    public float emptyChance = 0.35f; // Probabilidad de dejar espacio vacío para la pelota
+    public float emptyChance = 0.35f; 
 
      void Start()
     {
@@ -61,12 +61,10 @@ public class BlockGenerator : MonoBehaviour
 
                 GameObject newBlock = Instantiate(blockPrefab, spawnPos, Quaternion.identity, transform);
                 
-                // Ajustamos la escala del bloque generado para que no se vean gigantes
                 newBlock.transform.localScale = blockScale;
             }
         }
 
-        // Actualizamos las referencias de bloques en el GameManager
         if (GameManager.Instance != null)
         {
             GameManager.Instance.blocks = FindObjectsByType<Block>(FindObjectsSortMode.None);
