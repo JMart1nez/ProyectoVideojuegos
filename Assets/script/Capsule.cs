@@ -9,6 +9,8 @@ public class Capsule : MonoBehaviour
 
     private Transform currentBall;
 
+    private bool isCollected = false;
+
     // Direccion de movimiento personalizada
     [HideInInspector] public Vector3 moveDirection = Vector3.down;
 
@@ -23,15 +25,32 @@ public class Capsule : MonoBehaviour
 
     void Update()
     {
+        if (isCollected) return;
+
         transform.Translate(moveDirection * speed * Time.deltaTime, Space.World);
+
+        if (transform.position.y < -8f || Mathf.Abs(transform.position.x) > 22f)
+        {
+            Destroy(gameObject);
+        }
     }
 
     private void OnTriggerEnter(Collider other)
     {
+        if (other.CompareTag("DeadZone"))
+        {
+            Destroy(gameObject);
+            return;
+        }
+        
         if (other.CompareTag("Player"))
         {
+            isCollected = true;
+            
             GetComponent<Collider>().enabled = false;
             GetComponent<Renderer>().enabled = false;
+
+            float tiempoDeDestruccion = 0.1f;
 
             switch (type)
             {
@@ -39,23 +58,27 @@ public class Capsule : MonoBehaviour
                     MultiBall();
                     break;
                 case 1: // Poder: Agrandar jugador
-                    StartCoroutine(ExtendPlayer(other.transform, 5f));                    
+                    StartCoroutine(ExtendPlayer(other.transform, 5f));
+                    tiempoDeDestruccion = 5.5f;                    
                     break;
                 case 2: // Desventaja: Pelota veloz
                     StartCoroutine(ExtraSpeed());
+                    tiempoDeDestruccion = 4.5f;
                     break;
                 case 3: // Desventaja: Reducir jugador
-                    StartCoroutine(ClipPlayer(other.transform, 5f));                    
+                    StartCoroutine(ClipPlayer(other.transform, 5f));
+                    tiempoDeDestruccion = 5.5f;                    
                     break;
                 case 4: // Poder Novedoso: Imán Repulsor Temporal
                     StartCoroutine(RepulsorMagnet(other.transform, 6f, 3.5f));
+                    tiempoDeDestruccion = 6.5f;
                     break;
                 case 5: // Desventaja: Perder una vida
                     TakeDamage(other.gameObject);
                     break;
             }
 
-            Destroy(gameObject, 6.5f);
+            Destroy(gameObject, 0.1f);
         }
     }
 
@@ -100,9 +123,12 @@ public class Capsule : MonoBehaviour
             Ball b = currentBall.GetComponent<Ball>();
             if (b != null)
             {
-                b.MultiplySpeed(1.5f);
-                yield return new WaitForSeconds(4f);
-                b.MultiplySpeed(1f / 1.5f);
+                if (b.launchSpeed < 12f) 
+                {
+                    b.MultiplySpeed(1.5f);
+                    yield return new WaitForSeconds(4f);
+                    b.MultiplySpeed(1f / 1.5f);
+                }
             }
         }
     }

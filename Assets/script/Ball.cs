@@ -8,12 +8,11 @@ public class Ball : MonoBehaviour
 
     private Rigidbody rb;
     private bool isLaunched = false;
+    private bool isProcessingDeath = false;
 
-    // Define de que lado esta asignada esta pelota
     public enum PlayerSide { Left, Right }
     [Header("Configuración de Inicio")]
     public PlayerSide startingSide;
-    // Tecla para que el jugador lance la pelota
     public KeyCode launchKey;
 
     void Awake()
@@ -23,13 +22,15 @@ public class Ball : MonoBehaviour
 
     void Start()
     {
-        if(startingSide == PlayerSide.Left)
+        if (startingSide == PlayerSide.Left)
+            offset = new Vector3(0.75f, 0, 0);
+        else
+            offset = new Vector3(-0.75f, 0, 0);
+
+        if (!isLaunched)
         {
-            offset = new Vector3(0.75f, 0, 0);        
-        } else {
-            offset = new Vector3(-0.75f, 0, 0);        
-        }   
-        ResetBall();
+            ResetBall();
+        }
     }
 
     private void Update()
@@ -53,26 +54,47 @@ public class Ball : MonoBehaviour
     {
         if (!isLaunched) return;
 
-        // Mantener la velocidad constante
+        transform.position = new Vector3(transform.position.x, transform.position.y, 0f);
+
+        if (rb.linearVelocity.magnitude < 0.1f)
+        {
+            isLaunched = false; 
+            Launch();
+            return;
+        }
+
         rb.linearVelocity = rb.linearVelocity.normalized * launchSpeed;
 
-        // Validar el modo de juego para evitar el atasco correcto
         if (GameManager.Instance != null && GameManager.Instance.currentMode == GameMode.Solo)
         {
-            // Evitar trayectoria vertical pura
-            if (Mathf.Abs(rb.linearVelocity.x) < 2f)
-            {
-                float xDirection = Random.Range(0, 2) == 0 ? -1f : 1f;
-                rb.linearVelocity = new Vector3(xDirection * 2f, rb.linearVelocity.y, 0f).normalized * launchSpeed;
-            }
-        }
-        else 
-        {
-            // Evitar trayectoria horizontal
             if (Mathf.Abs(rb.linearVelocity.y) < 1.5f)
             {
-                float yDirection = Random.Range(0, 2) == 0 ? -1f : 1f;
-                rb.linearVelocity = new Vector3(rb.linearVelocity.x, yDirection * 1.5f, 0f).normalized * launchSpeed;
+                float yDir = (rb.linearVelocity.y >= 0) ? 1.5f : -1.5f;
+                rb.linearVelocity = new Vector3(rb.linearVelocity.x, yDir, 0f).normalized * launchSpeed;
+            }
+        }
+        else
+        {
+            if (Mathf.Abs(rb.linearVelocity.x) < 1.5f)
+            {
+                float xDirection = (rb.linearVelocity.x >= 0) ? 1.5f : -1.5f;
+                rb.linearVelocity = new Vector3(xDirection, rb.linearVelocity.y, 0f).normalized * launchSpeed;
+            }
+        }
+
+        if (Mathf.Abs(transform.position.x) > 20f || Mathf.Abs(transform.position.y) > 20f)
+        {
+            if (!isProcessingDeath)
+            {
+                GameObject deadZone = GameObject.FindGameObjectWithTag("DeadZone");
+                if (deadZone != null)
+                {
+                    OnTriggerEnter(deadZone.GetComponent<Collider>());
+                }
+                else if (paddle == null)
+                {
+                    Destroy(gameObject); // Si no encuentra DeadZone y es clon, forzar destrucción
+                }
             }
         }
     }
@@ -90,12 +112,25 @@ public class Ball : MonoBehaviour
         if (isLaunched) return;
 
         isLaunched = true;
-        float angle = Random.Range(-60f, 60f);
+        float angle;
+
+        // Ajuste de ángulo según el modo
+        if (GameManager.Instance != null && GameManager.Instance.currentMode == GameMode.Solo)
+        {
+            // En modo Individual sale disparada hacia arriba
+            angle = Random.Range(45f, 135f);
+        }
+        else
+        {
+            // En CoOp / Versus sale a los lados
+            angle = (startingSide == PlayerSide.Left) ? Random.Range(-45f, 45f) : Random.Range(135f, 225f);
+        }
+
         float radians = angle * Mathf.Deg2Rad;
         Vector3 direction = new Vector3(Mathf.Cos(radians), Mathf.Sin(radians), 0f);
         rb.linearVelocity = direction.normalized * launchSpeed;
     }
-
+    
     public void ResetBall()
     {
         isLaunched = false;
@@ -108,21 +143,47 @@ public class Ball : MonoBehaviour
     {
         if (other.CompareTag("DeadZone"))
         {
-            // Revisa cuántas pelotas hay en la escena
-            GameObject[] balls = GameObject.FindGameObjectsWithTag("Ball");
-            
-            if (balls.Length > 2) 
+            if (isProcessingDeath) return;
+
+            // 1. Identificar si es un CLON de Multibola
+            // Los clones se instancian desde un Prefab, por lo que su 'paddle' está vacío.
+            if (paddle == null)
             {
-                // Si hay más de una destruye esta copia
                 Destroy(gameObject);
+                return; 
+            }
+
+            // 2. Si llegamos aquí, es una PELOTA ORIGINAL
+            isProcessingDeath = true;
+            bool isSolo = GameManager.Instance != null && GameManager.Instance.currentMode == GameMode.Solo;
+
+            if (isSolo)
+            {
+                GameManager.Instance.LoseLifes();
             }
             else
             {
-                // Si es la última pelota que queda resta vidas
-                GameManager.Instance.LoseLifes();
-                ResetBall();
+                // Saber de qué lado del mapa cruzó la pelota (Izquierda = P1, Derecha = P2)
+                if (transform.position.x < 0)
+                {
+                    GameManager.Instance.LoseLifes(); // Falla P1
+                }
+                else
+                {
+                    GameManager.Instance.LoseLifesP2(); // Falla P2
+                }
             }
+
+            // 3. Regresar la pelota original a la paleta de su dueño
+            ResetBall();
+            Invoke(nameof(ReactivateDeath), 0.5f);
         }
+    }
+
+    // Método auxiliar
+    void ReactivateDeath()
+    {
+        isProcessingDeath = false;
     }
 
     public void MultiplySpeed(float multi)
@@ -132,14 +193,14 @@ public class Ball : MonoBehaviour
 
     private void OnCollisionEnter(Collision collision)
     {
-        if (collision.gameObject.CompareTag("Player")) 
+        if (collision.gameObject.CompareTag("Player"))
         {
-            // Compara las dimensiones para saber si la paleta está en vertical u horizontal
+            // Determina si el pad es vertical (Pong) u horizontal (Breakout)
             bool isVerticalPaddle = collision.collider.bounds.size.y > collision.collider.bounds.size.x;
 
             if (isVerticalPaddle)
             {
-                // Rebote para MODO PONG 
+                // Rebote para modo Co-Op / Versus (Izquierda - Derecha)
                 float offsetY = (transform.position.y - collision.transform.position.y) / collision.collider.bounds.size.y;
                 float directionX = (transform.position.x > collision.transform.position.x) ? 1f : -1f;
                 Vector3 newDirection = new Vector3(directionX, offsetY * 2.5f, 0f).normalized;
@@ -147,15 +208,18 @@ public class Ball : MonoBehaviour
             }
             else
             {
-                // Rebote para MODO CLÁSICO
+                // Rebote para modo Individual (Arriba - Abajo)
                 float offsetX = (transform.position.x - collision.transform.position.x) / collision.collider.bounds.size.x;
-                Vector3 newDirection = new Vector3(offsetX * 2.5f, 1f, 0f).normalized;
+                
+                // CORRECCIÓN: Verifica si la pelota está arriba o abajo del pad para rebotar en la dirección correcta
+                float directionY = (transform.position.y > collision.transform.position.y) ? 1f : -1f;
+                
+                Vector3 newDirection = new Vector3(offsetX * 2.5f, directionY, 0f).normalized;
                 rb.linearVelocity = newDirection * launchSpeed;
             }
         }
         else
         {
-            // Romper bucles al chocar con paredes o bloques
             Vector3 randomTweak = new Vector3(Random.Range(-0.2f, 0.2f), Random.Range(-0.2f, 0.2f), 0f);
             rb.linearVelocity = (rb.linearVelocity + randomTweak).normalized * launchSpeed;
         }
