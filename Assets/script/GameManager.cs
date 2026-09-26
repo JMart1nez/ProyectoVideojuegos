@@ -51,7 +51,7 @@ public class GameManager : MonoBehaviour
 
     void Start()
     {
-        blocks = FindObjectsByType<Block>(FindObjectsInactive.Exclude, FindObjectsSortMode.None);
+        blocks = FindObjectsByType<Block>(FindObjectsSortMode.None);
         blockCount = blocks.Length;
     }
 

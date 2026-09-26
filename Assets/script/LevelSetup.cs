@@ -36,6 +36,9 @@ public class LevelSetup : MonoBehaviour
         {
             mode = GameManager.Instance.currentMode;
 
+            GameManager.Instance.blocks = FindObjectsByType<Block>(FindObjectsSortMode.None);
+            GameManager.Instance.blockCount = GameManager.Instance.blocks.Length;
+
             // Ajustar vidas según el modo
             if (mode == GameMode.Solo)
             {
