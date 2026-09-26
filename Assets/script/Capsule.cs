@@ -174,13 +174,21 @@ public class Capsule : MonoBehaviour
     {
         if (GameManager.Instance != null)
         {
-            if (playerObj.name.Contains("2"))
+            if(GameManager.Instance.currentMode == GameMode.Solo)
             {
-                GameManager.Instance.LoseLifeP2();
-            }
-            else
+                GameManager.Instance.LoseLifes();
+            } else if(GameManager.Instance.currentMode == GameMode.CoOp)
             {
-                GameManager.Instance.LoseLifeP1();
+                GameManager.Instance.LoseLifes();
+            } else {
+                if (playerObj.name.Contains("2"))
+                {
+                    GameManager.Instance.LoseLifeP2();
+                }
+                else
+                {
+                    GameManager.Instance.LoseLifeP1();
+                }
             }
         }
     }

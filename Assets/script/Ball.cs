@@ -4,7 +4,7 @@ public class Ball : MonoBehaviour
 {
     public float launchSpeed = 8f;
     public Transform paddle;
-    public Vector3 offset;
+    public Vector3 offset;    
 
     private Rigidbody rb;
     private bool isLaunched = false;
@@ -22,11 +22,14 @@ public class Ball : MonoBehaviour
 
     void Start()
     {
-        if (startingSide == PlayerSide.Left)
-            offset = new Vector3(0.75f, 0, 0);
-        else
-            offset = new Vector3(-0.75f, 0, 0);
-
+        if(GameManager.Instance.currentMode == GameMode.Solo){
+            offset = new Vector3(0, 0.75f, 0);
+        } else {
+            if (startingSide == PlayerSide.Left)
+                offset = new Vector3(0.75f, 0, 0);
+            else
+                offset = new Vector3(-0.75f, 0, 0);
+        }
         if (!isLaunched)
         {
             ResetBall();
