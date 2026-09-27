@@ -31,4 +31,9 @@ public class ButtonManager : MonoBehaviour
     {
         SceneManager.LoadScene("Menu");
     }
+
+    public void QuitGame()
+    {
+        Application.Quit();
+    }
 }

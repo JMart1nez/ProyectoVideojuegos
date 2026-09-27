@@ -42,13 +42,13 @@ public class LevelSetup : MonoBehaviour
             // Ajustar vidas según el modo
             if (mode == GameMode.Solo)
             {
-                GameManager.Instance.lifes = 3;
-                GameManager.Instance.lifesP2 = 3;
+                GameManager.Instance.lifes = 4;
+                GameManager.Instance.lifesP2 = 4;
             }
             else
             {
-                GameManager.Instance.lifes = 5;
-                GameManager.Instance.lifesP2 = 5;
+                GameManager.Instance.lifes = 6;
+                GameManager.Instance.lifesP2 = 6;
             }
             
             GameManager.Instance.points = 0;
