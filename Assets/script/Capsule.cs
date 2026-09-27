@@ -6,9 +6,7 @@ public class Capsule : MonoBehaviour
     public float speed = 3f;
     public GameObject prefabBall;
     public int type = 0;
-
-    private Transform currentBall;
-
+    
     private bool isCollected = false;
 
     // Direccion de movimiento personalizada
@@ -16,9 +14,6 @@ public class Capsule : MonoBehaviour
 
     void Start()
     {
-        GameObject ballObj = GameObject.FindGameObjectWithTag("Ball");
-        if (ballObj != null) currentBall = ballObj.transform;
-        
         // 0, 1, 4: Poderes | 2, 3, 5: Desventajas
         type = Random.Range(0, 6);                         
     }
@@ -42,7 +37,7 @@ public class Capsule : MonoBehaviour
             Destroy(gameObject);
             return;
         }
-        
+
         if (other.CompareTag("Player"))
         {
             isCollected = true;
@@ -87,17 +82,40 @@ public class Capsule : MonoBehaviour
     // MULTIBOLA
     void MultiBall()
     {
-        if (currentBall == null) return;
+        // Obtener todas las pelotas en la escena
+        GameObject[] allBalls = GameObject.FindGameObjectsWithTag("Ball");
+        if (allBalls.Length == 0) return;
 
-        for (int i = 0; i < 2; i++)
+        float lifetime = 6f; // Tiempo que duraran las pelotas clonadas
+
+        foreach (GameObject ballObj in allBalls)
         {
-            Vector3 offset = new Vector3((i == 0 ? 0.8f : -0.8f), 0.5f, 0f);
-            GameObject newBall = Instantiate(prefabBall, currentBall.position + offset, Quaternion.identity);
-            
-            Ball ballScript = newBall.GetComponent<Ball>();
-            if (ballScript != null)
+            if (ballObj == null) continue;
+
+            Ball ballScript = ballObj.GetComponent<Ball>();
+
+            // Solo multiplicamos si es una de las pelotas INICIALES/PRINCIPALES
+            if (ballScript != null && ballScript.isOriginal)
             {
-                ballScript.Launch();
+                // Instanciar 2 pelotas por cada pelota principal
+                for (int i = 0; i < 2; i++)
+                {
+                    Vector3 offset = new Vector3((i == 0 ? 0.7f : -0.7f), 0.4f, 0f);
+                    GameObject newBallObj = Instantiate(prefabBall, ballObj.transform.position + offset, Quaternion.identity);
+
+                    Ball newBallScript = newBallObj.GetComponent<Ball>();
+                    if (newBallScript != null)
+                    {
+                        // Marcar la nueva pelota como clon
+                        newBallScript.isOriginal = false;
+
+                        // Lanzar la pelota
+                        newBallScript.Launch();
+                    }
+
+                    // Autodestruir la pelota extra tras el tiempo limite
+                    Destroy(newBallObj, lifetime);
+                }
             }
         }
     }
@@ -118,17 +136,44 @@ public class Capsule : MonoBehaviour
 
     IEnumerator ExtraSpeed()
     {
-        if (currentBall != null)
+        // Obtener todas las pelotas activas en la escena
+        GameObject[] allBalls = GameObject.FindGameObjectsWithTag("Ball");
+        if (allBalls.Length == 0) yield break;
+
+        float speedMultiplier = 1.5f;
+        float duration = 4f;
+
+        // Guardamos las pelotas principales afectadas para restaurarles la velocidad despues
+        System.Collections.Generic.List<Ball> affectedBalls = new System.Collections.Generic.List<Ball>();
+
+        // Aplicar el aumento de velocidad solo a las pelotas INICIALES
+        foreach (GameObject ballObj in allBalls)
         {
-            Ball b = currentBall.GetComponent<Ball>();
+            if (ballObj == null) continue;
+
+            Ball b = ballObj.GetComponent<Ball>();
+
+            // Solo afecta a las pelotas originales y que no superen el limite de velocidad
+            if (b != null && b.isOriginal)
+            {
+                if (b.launchSpeed < 12f)
+                {
+                    b.MultiplySpeed(speedMultiplier);
+                    affectedBalls.Add(b); // La guardamos en la lista
+                }
+            }
+        }
+
+        // Esperar el tiempo que dura la desventaja
+        yield return new WaitForSeconds(duration);
+
+        // Restaurar la velocidad original solo a las pelotas que siguen existiendo en la escena
+        foreach (Ball b in affectedBalls)
+        {
+            // Verificacion de seguridad por si la pelota fue destruida durante los 4 segundos
             if (b != null)
             {
-                if (b.launchSpeed < 12f) 
-                {
-                    b.MultiplySpeed(1.5f);
-                    yield return new WaitForSeconds(4f);
-                    b.MultiplySpeed(1f / 1.5f);
-                }
+                b.MultiplySpeed(1f / speedMultiplier);
             }
         }
     }

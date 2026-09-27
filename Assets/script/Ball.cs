@@ -9,8 +9,9 @@ public class Ball : MonoBehaviour
     private Rigidbody rb;
     private bool isLaunched = false;
     private bool isProcessingDeath = false;
+    public bool isOriginal = true;
 
-    public enum PlayerSide { Left, Right }
+    public enum PlayerSide { Left, Right, Both }
     [Header("Configuración de Inicio")]
     public PlayerSide startingSide;
     public KeyCode launchKey;

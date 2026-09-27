@@ -367,6 +367,7 @@ MonoBehaviour:
   launchSpeed: 8
   paddle: {fileID: 936039094}
   offset: {x: 0, y: 1, z: 0}
+  isOriginal: 1
   startingSide: 0
   launchKey: 32
 --- !u!1001 &85909030
@@ -11525,7 +11526,8 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 4731412867654578729, guid: c81508734a4578c4eb9cfaa2b1fd73bc, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents:

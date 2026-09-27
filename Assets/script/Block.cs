@@ -31,9 +31,16 @@ public class Block : MonoBehaviour
                 else if (GameManager.Instance.currentMode == GameMode.Versus)
                 {
                     if (ball.startingSide == Ball.PlayerSide.Left)
+                    {
                         GameManager.Instance.AddPointsP1(100);
-                    else
+                    }
+                    else if (ball.startingSide == Ball.PlayerSide.Right)
+                    {
                         GameManager.Instance.AddPointsP2(100);
+                    } else {
+                        GameManager.Instance.AddPointsP1(100);
+                        GameManager.Instance.AddPointsP2(100);
+                    }
                 }
             }
 
